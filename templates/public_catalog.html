@@ -34,17 +34,16 @@
 	<div class="col-sm-1"></div>
 </div>
 
-
 <div class="row">
-	<div class="col-sm-6 category-list">
+	<div class="col-sm-4 category-list">
 		<h3>Categories</h3>
 		<ul>
 		{% for category in categories %}
 			<!-- fix urls for items -->
 			<li>
-			<a href = "{{url_for('showItems', category_id = category.id)}}">
-			<!-- <a href = "#"> -->
-			{{category.name}}</a></li>
+			<a href = "{{url_for('showCategory', category_name = category.name)}}">
+			{{category.name}}
+			</a></li>
 		{% endfor %}
 		</ul>
 	</div>
@@ -54,9 +53,12 @@
 		<ul>
 		{% for item in recents %}
 			<li>
-			{#  <a href = "{{url_for('showItems', item_id = item.id)}}"> #}
-			<a href="#">
-			{{item.name}}</a>
+			<a href = "{{url_for('showItem', item_name= item.name, category_name = item.category.name )}}">
+			{{item.name}}</a>,
+			<!-- <a href="#"> -->
+			<a href = "{{url_for('showCategory', category_name = item.category.name)}}">
+			<i>{{ item.category.name }}</i>
+			</a>
 			</li>
 		{% endfor %}
 		</ul>

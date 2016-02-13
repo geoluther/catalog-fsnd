@@ -282,94 +282,52 @@ def restaurantsJSON():
 
 
 
-# Show all restaurants
+# Show all categories
 @app.route('/')
 @app.route('/catalog/')
 def showCategories():
   categories = session.query(Category).order_by(asc(Category.name))
-  ## fix to get recent 10 adds, i.e. 10 greatest ID #
   recent_items = session.query(Item).order_by(desc(Item.id)).limit(8)
+
   if 'username' not in login_session: ## add public_catalog.html file later
     return render_template('public_catalog.html', categories=categories, recents=recent_items)
   else:
     return render_template('catalog.html', categories=categories, recents=recent_items)
 
-# Create a new restaurant
 
-
-@app.route('/catalog/new/', methods=['GET', 'POST'])
-def newItem():
-  if 'username' not in login_session:
-    return redirect('/login')
-  if request.method == 'POST':
-    newIten = Item(
-      name=request.form['name'], user_id=login_session['user_id'])
-    session.add(newRestaurant)
-    flash('New Item %s Successfully Created' % newItem.name)
-    session.commit()
-    return redirect(url_for('showCategories'))
-  else:
-    return render_template('newItem.html')
-
-# Edit a restaurant
-
-
-@app.route('/restaurant/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
-def editRestaurant(restaurant_id):
-  print "edit restaurant"
-  if 'username' not in login_session:
-    print "redirect to login!"
-    return redirect('/login')
-  editedRestaurant = session.query(
-    Restaurant).filter_by(id=restaurant_id).one()
-  print editedRestaurant.name
-  if request.method == 'POST':
-    print "post request!"
-    if request.form['name']:
-      editedRestaurant.name = request.form['name']
-      flash('Restaurant Successfully Edited %s' % editedRestaurant.name)
-      return redirect(url_for('showRestaurants'))
-  else:
-      print "render editRestaurant.html"
-      return render_template('editRestaurant.html', restaurant=editedRestaurant)
-
-
-# Delete a restaurant
-@app.route('/restaurant/<int:restaurant_id>/delete/', methods=['GET', 'POST'])
-def deleteRestaurant(restaurant_id):
-  if 'username' not in login_session:
-    return redirect('/login')
-  restaurantToDelete = session.query(
-    Restaurant).filter_by(id=restaurant_id).one()
-  if request.method == 'POST':
-    session.delete(restaurantToDelete)
-    flash('%s Successfully Deleted' % restaurantToDelete.name)
-    session.commit()
-    return redirect(url_for('showRestaurants', restaurant_id=restaurant_id))
-  else:
-    return render_template('deleteRestaurant.html', restaurant=restaurantToDelete)
-
-
-# Show a category menu
-## check is user is owner, if so, render rest page,
+## Route with category names
+## check if user is owner, if so, render rest page,
 ## else, render public page
-@app.route('/catalog/<int:category_id>/')
-@app.route('/catalog/<int:category_id>/item/')
-def showItems(category_id):
-  category = session.query(Category).filter_by(id=category_id).one()
+@app.route('/catalog/<category_name>/')
+def showCategory(category_name):
+  categories = session.query(Category).order_by(asc(Category.name))
+  category = session.query(Category).filter_by(name=category_name).one()
+  category_id = category.id
+  print category.name
   items = session.query(Item).filter_by(
     category_id=category_id).all()
-  #creator = getUserInfo(restaurant.user_id)
   creator = "foo"
   print creator
   if ('username' not in login_session or
     creator.id != login_session['user_id']):
-    return render_template('public_items.html', items=items,
-      category= category, creator= creator)
+    return render_template('public_category.html', items=items,
+      category= category, categories = categories, creator= creator)
   else:
-    return render_template('items.html', items=items,
-      category= category, creator= creator)
+    return render_template('test_template.html', items=items,
+      category= category, categories = categories, creator= creator)
 
+
+@app.route('/catalog/<category_name>/<item_name>/')
+def showItem(item_name, category_name):
+  item = session.query(Item).filter_by(name=item_name).one()
+  creator = 'foo'
+  if ('username' not in login_session or
+    creator.id != login_session['user_id']):
+    return render_template('public_item.html', item=item,
+      category= category_name, creator= creator)
+  else:
+    return render_template('test_template.html', item=item,
+      category= category_name, creator= creator)
 
 
 # Create a new menu item
@@ -390,29 +348,28 @@ def newMenuItem(restaurant_id):
 
 # Edit a menu item
 
+@app.route('/catalog/<category_name>/<item_name>/edit', methods=['GET', 'POST'])
+def editItem(item_name, category_name):
+  # uncomment later
+  # if 'username' not in login_session:
+  #   return redirect('/login')
 
-@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/edit', methods=['GET', 'POST'])
-def editMenuItem(restaurant_id, menu_id):
-  if 'username' not in login_session:
-    return redirect('/login')
-
-  editedItem = session.query(MenuItem).filter_by(id=menu_id).one()
-  restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
+  editedItem = session.query(Item).filter_by(name=item_name).one()
   if request.method == 'POST':
       if request.form['name']:
           editedItem.name = request.form['name']
       if request.form['description']:
           editedItem.description = request.form['description']
-      if request.form['price']:
-          editedItem.price = request.form['price']
-      if request.form['course']:
-          editedItem.course = request.form['course']
+      if request.form['picture']:
+          editedItem.picture = request.form['picture']
+      if request.form['category']:
+          editedItem.category = request.form['category']
       session.add(editedItem)
       session.commit()
-      flash('Menu Item Successfully Edited')
-      return redirect(url_for('showMenu', restaurant_id=restaurant_id))
+      flash('Item Successfully Edited')
+      return redirect(url_for('showItem', item_name=editedItem.name, category_name=editedItem.category.name))
   else:
-      return render_template('editmenuitem.html', restaurant_id=restaurant_id, menu_id=menu_id, item=editedItem)
+      return render_template('edit_item.html', item=editedItem)
 
 
 # Delete a menu item

@@ -100,6 +100,5 @@ session.commit()
 
 ## add users here
 
-
 print "added lots of items and users!"
 
