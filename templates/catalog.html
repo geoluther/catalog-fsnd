@@ -13,7 +13,7 @@
 	<div class="row banner main">
 		<div class="col-md-1"></div>
 		<div class="col-md-11 padding-none">
-			<h1>Restaurants</h1>
+			<h1>Catalog</h1>
 		</div>
 	</div>
 
@@ -41,7 +41,9 @@
 		</div>
 		<div class="col-md-1"></div>
 	</div>
-	{% for category in categoies %}
+
+
+	{% for category in categories %}
 		<a href = "{{url_for('showItem', restaurant_id = restaurant.id)}}">
 			<div class="row">
 				<div class="col-md-1"></div>
@@ -51,5 +53,6 @@
 				<div class="col-md-1"></div>
 			</div>
 		</a>
+
 	{% endfor %}
 {% endblock %}

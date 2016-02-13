@@ -45,6 +45,9 @@ class Item(Base):
     category_id = Column(Integer,ForeignKey('category.id'))
     category = relationship(Category)
 
+    # add users later
+    # user_id = Column(Integer, ForeignKey('user.id'))
+    # user = relationship(User)
 
     def serialize(self):
        """Return object data in easily serializeable format"""

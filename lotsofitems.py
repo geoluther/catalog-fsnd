@@ -44,6 +44,58 @@ Item5 = Item(name = "Moog Modular", description = "Monophonic Nirvana", category
 session.add(Item5)
 session.commit()
 
+## Category Two
+
+cat2 = Category(name="Guitars")
+session.add(cat1)
+session.commit()
+
+Item1 = Item(name = "Fender Stratocaster", description = "Single re-Coiling", category = cat2)
+session.add(Item1)
+session.commit()
+
+Item2 = Item(name = "Fender Telecaster", description = "When Two Singles is Enough", category = cat2)
+session.add(Item2)
+session.commit()
+
+Item3 = Item(name = "Gibson Les Paul", description = "Heavy Enough", category = cat2)
+session.add(Item3)
+session.commit()
+
+Item4 = Item(name = "Gretsch Country Gentleman", description = "Yes Yes Yes", category = cat2)
+session.add(Item4)
+session.commit()
+
+Item5 = Item(name = "Gibson ES 335", description = "Archtop Semi-acoustic", category = cat2)
+session.add(Item5)
+session.commit()
+
+# basses
+
+cat3 = Category(name="Basses")
+session.add(cat1)
+session.commit()
+
+Item1 = Item(name = "Fender Jazz Bass", description = "Smooth", category = cat3)
+session.add(Item1)
+session.commit()
+
+Item2 = Item(name = "Fender Precision Bass", description = "A Classic", category = cat3)
+session.add(Item2)
+session.commit()
+
+Item3 = Item(name = "Rickenbacker", description = "Heavy Enough For Lemmy", category = cat3)
+session.add(Item3)
+session.commit()
+
+Item4 = Item(name = "Gibson Explorer Bass", description = "Get Yer Growl On", category = cat3)
+session.add(Item4)
+session.commit()
+
+Item5 = Item(name = "Ernie Ball Music Man", description = "Suck My Kiss", category = cat3)
+session.add(Item5)
+session.commit()
+
 #KEEP ADDING STUFF
 
 ## add users here

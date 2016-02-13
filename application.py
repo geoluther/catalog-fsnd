@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
-from sqlalchemy import create_engine, asc
+from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
-from database_setup_users import Base, Category, Item, User
+from database_setup import Base, Category, Item, User
 from flask import session as login_session
 import random
 import string
@@ -287,27 +287,31 @@ def restaurantsJSON():
 @app.route('/catalog/')
 def showCategories():
   categories = session.query(Category).order_by(asc(Category.name))
+  ## fix to get recent 10 adds, i.e. 10 greatest ID #
+  recent_items = session.query(Item).order_by(desc(Item.id)).limit(8)
+  for item in recent_items:
+    print item.name
   if 'username' not in login_session: ## add public_catalog.html file later
-    return render_template('public_catalog.html', categories=categories)
+    return render_template('public_catalog.html', categories=categories, recents=recent_items)
   else:
-    return render_template('catalog.html', categories=categories)
+    return render_template('catalog.html', categories=categories, recents=recent_items)
 
 # Create a new restaurant
 
 
 @app.route('/catalog/new/', methods=['GET', 'POST'])
-def newRestaurant():
+def newItem():
   if 'username' not in login_session:
     return redirect('/login')
   if request.method == 'POST':
-    newRestaurant = Restaurant(
+    newIten = Item(
       name=request.form['name'], user_id=login_session['user_id'])
     session.add(newRestaurant)
-    flash('New Restaurant %s Successfully Created' % newRestaurant.name)
+    flash('New Item %s Successfully Created' % newItem.name)
     session.commit()
-    return redirect(url_for('showRestaurants'))
+    return redirect(url_for('showCategories'))
   else:
-    return render_template('newRestaurant.html')
+    return render_template('newItem.html')
 
 # Edit a restaurant
 
@@ -348,24 +352,25 @@ def deleteRestaurant(restaurant_id):
     return render_template('deleteRestaurant.html', restaurant=restaurantToDelete)
 
 
-# Show a restaurant menu
+# Show a category menu
 ## check is user is owner, if so, render rest page,
 ## else, render public page
-@app.route('/restaurant/<int:restaurant_id>/')
-@app.route('/restaurant/<int:restaurant_id>/menu/')
-def showMenu(restaurant_id):
-  restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
-  items = session.query(MenuItem).filter_by(
-    restaurant_id=restaurant_id).all()
-  creator = getUserInfo(restaurant.user_id)
+@app.route('/catalog/<int:category_id>/')
+@app.route('/catalog/<int:category_id>/item/')
+def showItems(category_id):
+  category = session.query(Category).filter_by(id=category_id).one()
+  items = session.query(Item).filter_by(
+    category_id=category_id).all()
+  #creator = getUserInfo(restaurant.user_id)
+  creator = "foo"
   print creator
   if ('username' not in login_session or
     creator.id != login_session['user_id']):
-    return render_template('publicmenu.html', items=items,
-      restaurant=restaurant, creator= creator)
+    return render_template('public_items.html', items=items,
+      category= category, creator= creator)
   else:
-    return render_template('menu.html', items=items,
-      restaurant=restaurant, creator= creator)
+    return render_template('items.html', items=items,
+      category= category, creator= creator)
 
 
 
@@ -451,9 +456,9 @@ def disconnect():
 
 
 ## commented out for heroku deploymnent
-# if __name__ == '__main__':
-app.secret_key = 'super_secret_key'
-app.debug = True
-# app.run(host='0.0.0.0', port=5000)
+if __name__ == '__main__':
+  app.secret_key = 'super_secret_key'
+  app.debug = True
+  app.run(host='0.0.0.0', port=5000)
 
 
