@@ -289,8 +289,6 @@ def showCategories():
   categories = session.query(Category).order_by(asc(Category.name))
   ## fix to get recent 10 adds, i.e. 10 greatest ID #
   recent_items = session.query(Item).order_by(desc(Item.id)).limit(8)
-  for item in recent_items:
-    print item.name
   if 'username' not in login_session: ## add public_catalog.html file later
     return render_template('public_catalog.html', categories=categories, recents=recent_items)
   else:
