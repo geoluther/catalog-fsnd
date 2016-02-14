@@ -182,6 +182,7 @@ def gconnect():
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
+    login_session['provider'] = 'google'
 
     user_id = getUserID(data['email'])
     if not user_id:
@@ -195,7 +196,7 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 200px; height: 200px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -252,8 +253,8 @@ def gdisconnect():
       response = make_response(json.dumps('Successfully disconnected.'), 200)
       response.headers['Content-Type'] = 'application/json'
       return response
-    else:
 
+    else:
       response = make_response(json.dumps('Failed to revoke token for given user.', 400))
       response.headers['Content-Type'] = 'application/json'
       return response
@@ -319,12 +320,13 @@ def showCategory(category_name):
 def showItem(item_name):
   print item_name
   item = session.query(Item).filter_by(name=item_name).one()
-  creator = getUserInfo(item.user_id)
+  # creator = getUserInfo(item.user_id)
+  creator = 42
   if ('username' not in login_session or
     creator.id != login_session['user_id']):
-    return render_template('public_item.html', item=item, creator= creator)
+    return render_template('public_item.html', item=item)
   else:
-    return render_template('item.html', item=item, creator= creator)
+    return render_template('item.html', item=item, creator= "foo")
 
 
 # Create a new item
