@@ -35,6 +35,7 @@ def showLogin():
     # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
 
+
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
     if request.args.get('state') != login_session['state']:
@@ -95,7 +96,7 @@ def fbconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 200px; height: 200px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
 
     flash("Now logged in as %s" % login_session['username'])
     return output
@@ -197,14 +198,13 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 200px; height: 200px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
 
+
 # User Helper Functions
-
-
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
@@ -218,6 +218,7 @@ def getUserInfo(user_id):
     user = session.query(User).filter_by(id=user_id).one()
     return user
 
+
 def getUserID(email):
     try:
         user = session.query(User).filter_by(email=email).one()
@@ -225,9 +226,8 @@ def getUserID(email):
     except:
         return None
 
+
 # DISCONNECT - Revoke a current user's token and reset their login_session
-
-
 @app.route('/gdisconnect')
 def gdisconnect():
     # Only disconnect a connected user.
@@ -249,7 +249,7 @@ def gdisconnect():
         return response
 
 
-# JSON APIs to view Restaurant Information
+# JSON APIs to view DB Information
 @app.route('/restaurant/<int:restaurant_id>/menu/JSON')
 def restaurantMenuJSON(restaurant_id):
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
@@ -264,11 +264,10 @@ def menuItemJSON(restaurant_id, menu_id):
     return jsonify(Menu_Item=Menu_Item.serialize)
 
 
-@app.route('/restaurant/JSON')
-def restaurantsJSON():
-    restaurants = session.query(Restaurant).all()
-    return jsonify(restaurants=[r.serialize for r in restaurants])
-
+@app.route('/catalog/JSON')
+def catalogJSON():
+    items = session.query(Item).all()
+    return jsonify(items=[r.serialize for r in items])
 
 
 # Show all categories
@@ -278,7 +277,7 @@ def showCatalog():
   categories = session.query(Category).order_by(asc(Category.name))
   recent_items = session.query(Item).order_by(desc(Item.id)).limit(8)
 
-  if 'username' not in login_session: ## add public_catalog.html file later
+  if 'username' not in login_session:
     print "rending public_catalog.html"
     return render_template('public_catalog.html', categories=categories, recents=recent_items)
   else:
@@ -291,12 +290,13 @@ def showCatalog():
 ## else, render public page
 @app.route('/catalog/<category_name>/items/')
 def showCategory(category_name):
-  categories = session.query(Category).order_by(asc(Category.name))
+  categories = session.query(Category).order_by(asc(Category.name)).all()
   category = session.query(Category).filter_by(name=category_name).one()
-  category_id = category.id
-  print category.name
+  print "calling showCategory"
+  print category.id, category.name
   items = session.query(Item).filter_by(
-    category_id=category_id).all()
+    category_id=category.id).all()
+
   if 'username' not in login_session:
     return render_template('public_category.html', items=items,
       category= category, categories = categories)
@@ -337,11 +337,10 @@ def newItem():
   else:
       return render_template('new_item.html')
 
-# Edit a menu item
 
+# Edit a menu item
 @app.route('/catalog/<path:item_name>/edit/', methods=['GET', 'POST'])
 def editItem(item_name):
-  # uncomment later
   if 'username' not in login_session:
     return redirect('/login')
 
@@ -353,10 +352,12 @@ def editItem(item_name):
       if request.form['description']:
           editedItem.description = request.form['description']
       if request.form['picture']:
-          editedItem.picture = request.form['picture']
+        editedItem.picture = request.form['picture']
       # fix categories
-      # if request.form['category']:
-      #     editedItem.category = request.form['category']
+      if request.form['category']:
+        cat = request.form['category']
+        category = session.query(Category).filter_by(name=cat).one()
+        editedItem.category = category
       session.add(editedItem)
       session.commit()
       flash('Item Successfully Edited')
@@ -379,7 +380,6 @@ def deleteItem(item_name):
   else:
     return render_template('delete_Item.html', item=itemToDelete)
 
-# Disconnect based on provider
 # Disconnect based on provider
 @app.route('/disconnect')
 def disconnect():
