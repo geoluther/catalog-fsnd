@@ -182,13 +182,13 @@ def gconnect():
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
-    login_session['provider'] = 'google'
 
     user_id = getUserID(data['email'])
     if not user_id:
       user_id = createUser(login_session)
 
     login_session['user_id'] = user_id
+    login_session['provider'] = 'google'
 
     output = ''
     output += '<h1>Welcome, '
