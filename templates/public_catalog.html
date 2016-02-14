@@ -28,9 +28,9 @@
 </div>
 
 
-<div class="row padding-top padding-bottom">
-	<div class="col-sm-1"></div>
-	<div class="col-sm-10 padding-none"></div>
+<div class="row padding-top">
+	<div class="col-sm-3"></div>
+	<div class="col-sm-6 padding-none"></div>
 	<div class="col-sm-1"></div>
 </div>
 
@@ -53,7 +53,7 @@
 		<ul>
 		{% for item in recents %}
 			<li>
-			<a href = "{{url_for('showItem', item_name= item.name, category_name = item.category.name )}}">
+			<a href = "{{url_for('showItem', item_name= item.name)}}">
 			{{item.name}}</a>,
 			<!-- <a href="#"> -->
 			<a href = "{{url_for('showCategory', category_name = item.category.name)}}">
