@@ -329,7 +329,8 @@ def newItem():
       newItem = Item(name=request.form['name'], description=request.form[
                          'description'], picture=request.form['picture'],
                          category=category, user_id=login_session['user_id'])
-      ## work on categories
+      ## fix so items can't have same names
+      ## error page if name is duplicate?
       session.add(newItem)
       session.commit()
       flash('New %s Item Successfully Created' % (newItem.name))
@@ -344,7 +345,7 @@ def editItem(item_name):
   if 'username' not in login_session:
     return redirect('/login')
 
-  editedItem = session.query(Item).filter_by(name=item_name).one()
+  editedItem = session.query(Item).filter_by(name=item_name).first()
 
   if request.method == 'POST':
       if request.form['name']:
