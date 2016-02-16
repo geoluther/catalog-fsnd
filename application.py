@@ -291,7 +291,9 @@ def showCatalog():
 @app.route('/catalog/<category_name>/items/')
 def showCategory(category_name):
   categories = session.query(Category).order_by(asc(Category.name)).all()
-  category = session.query(Category).filter_by(name=category_name).one()
+  category = session.query(Category).filter_by(name=category_name).one_or_none()
+  if category == None:
+    abort()
   print "calling showCategory"
   print category.id, category.name
   items = session.query(Item).filter_by(
