@@ -3,7 +3,7 @@
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
-rom flask import make_response
+from flask import make_response
 import requests
 
 @app.route('/fbconnect', methods=['POST'])

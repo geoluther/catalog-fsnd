@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash
+from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, abort
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item, User
@@ -291,9 +291,9 @@ def showCatalog():
 @app.route('/catalog/<category_name>/items/')
 def showCategory(category_name):
   categories = session.query(Category).order_by(asc(Category.name)).all()
-  category = session.query(Category).filter_by(name=category_name).one_or_none()
+  category = session.query(Category).filter_by(name=category_name).first()
   if category == None:
-    abort()
+    abort(404)
   print "calling showCategory"
   print category.id, category.name
   items = session.query(Item).filter_by(
@@ -310,7 +310,9 @@ def showCategory(category_name):
 @app.route('/catalog/<path:item_name>/')
 def showItem(item_name):
   print item_name
-  item = session.query(Item).filter_by(name=item_name).one()
+  item = session.query(Item).filter_by(name=item_name).first()
+  if item == None:
+    abort(404)
   creator = getUserInfo(item.user_id)
   if ('username' not in login_session or
     creator.id != login_session['user_id']):
