@@ -30,7 +30,7 @@ session.commit()
 
 # Categories
 
-cat1 = Category(name="Classic Keyboards")
+cat1 = Category(name="Keys and Synths")
 session.add(cat1)
 session.commit()
 

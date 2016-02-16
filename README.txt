@@ -22,3 +22,6 @@ user-item-ids
 - pictures pulled from placeimg (slow)
 - add images to static dir later
 - add rss feed of catalog?
+
+
+JSON Endpoint: http://localhost:5000/catalog/JSON

@@ -165,3 +165,8 @@ u }
 	list-style-type: none;
 	text-align: center;
 }
+
+ul {
+	list-style-type: none;
+	padding-left: 0px;
+}
