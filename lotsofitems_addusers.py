@@ -65,27 +65,27 @@ cat2 = Category(name="Guitars")
 session.add(cat1)
 session.commit()
 
-Item1 = Item(user_id=2, name = "Fender Stratocaster", description = "Single re-Coiling",
+Item1 = Item(user_id=2, name = "Fender Stratocaster", description = "Single re-coiling.",
 	picture="/static/img/stratocaster.jpg", category = cat2)
 session.add(Item1)
 session.commit()
 
-Item2 = Item(user_id=2, name = "Fender Telecaster", description = "When Two Singles is Enough",
+Item2 = Item(user_id=2, name = "Fender Telecaster", description = "Two singles: Why need more?",
 	picture="/static/img/telecaster.jpg", category = cat2)
 session.add(Item2)
 session.commit()
 
-Item3 = Item(user_id=2, name = "Gibson Les Paul", description = "Heavy Enough",
+Item3 = Item(user_id=2, name = "Gibson Les Paul", description = "Heavy enough.",
 	picture="/static/img/lespaul.jpg", category = cat2)
 session.add(Item3)
 session.commit()
 
-Item4 = Item(user_id=2, name = "Gretsch Country Gentleman", description = "Yes Yes Yes",
+Item4 = Item(user_id=2, name = "Gretsch Country Gentleman", description = "Yes Yes Yes.",
 	picture="/static/img/gretsch-countryg.jpg", category = cat2)
 session.add(Item4)
 session.commit()
 
-Item5 = Item(user_id=2, name = "Gibson ES 335", description = "Archtop Semi-acoustic",
+Item5 = Item(user_id=2, name = "Gibson ES 335", description = "Archtop Semi-acoustic.",
 	picture="/static/img/gibson-es335.jpg", category = cat2)
 session.add(Item5)
 session.commit()
