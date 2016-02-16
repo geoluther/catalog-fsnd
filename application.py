@@ -292,6 +292,8 @@ def showCatalog():
 def showCategory(category_name):
   categories = session.query(Category).order_by(asc(Category.name)).all()
   category = session.query(Category).filter_by(name=category_name).one()
+  if category is None:
+        abort(404)
   print "calling showCategory"
   print category.id, category.name
   items = session.query(Item).filter_by(
