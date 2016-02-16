@@ -35,27 +35,27 @@ session.add(cat1)
 session.commit()
 
 Item1 = Item(user_id=1, name = "Yamaha DX7", description = "Classic FM Synthesis",
-	picture="https://placeimg.com/150/150/any", category = cat1)
+	picture="/static/img/dx7.jpg", category = cat1)
 session.add(Item1)
 session.commit()
 
 Item2 = Item(user_id=1, name = "microKORG", description = "Synthesizer + Vocoder",
-	picture="https://placeimg.com/150/150/any", category = cat1)
+	picture="/static/img/microKORG.jpg", category = cat1)
 session.add(Item2)
 session.commit()
 
 Item3 = Item(user_id=1, name = "ARP 2600", description = "In your dreams",
-	picture="https://placeimg.com/150/150/any", category = cat1)
+	picture="/static/img/ARP_2600.jpg", category = cat1)
 session.add(Item3)
 session.commit()
 
 Item4 = Item(user_id=1, name = "Roland Jupiter 4", description = "Her name is Rio",
-	picture="https://placeimg.com/150/150/any", category = cat1)
+	picture="/static/img/jupiter4.jpg", category = cat1)
 session.add(Item4)
 session.commit()
 
 Item5 = Item(user_id=1, name = "Moog Modular", description = "Monophonic Nirvana",
-	picture="https://placeimg.com/150/150/any", category = cat1)
+	picture="/static/img/moogMod.jpg", category = cat1)
 session.add(Item5)
 session.commit()
 
@@ -66,27 +66,27 @@ session.add(cat1)
 session.commit()
 
 Item1 = Item(user_id=2, name = "Fender Stratocaster", description = "Single re-Coiling",
-	picture="https://placeimg.com/150/150/any", category = cat2)
+	picture="/static/img/stratocaster.jpg", category = cat2)
 session.add(Item1)
 session.commit()
 
 Item2 = Item(user_id=2, name = "Fender Telecaster", description = "When Two Singles is Enough",
-	picture="https://placeimg.com/150/150/any", category = cat2)
+	picture="/static/img/telecaster.jpg", category = cat2)
 session.add(Item2)
 session.commit()
 
 Item3 = Item(user_id=2, name = "Gibson Les Paul", description = "Heavy Enough",
-	picture="https://placeimg.com/150/150/any", category = cat2)
+	picture="/static/img/lespaul.jpg", category = cat2)
 session.add(Item3)
 session.commit()
 
 Item4 = Item(user_id=2, name = "Gretsch Country Gentleman", description = "Yes Yes Yes",
-	picture="https://placeimg.com/150/150/any", category = cat2)
+	picture="/static/img/gretsch-countryg.jpg", category = cat2)
 session.add(Item4)
 session.commit()
 
 Item5 = Item(user_id=2, name = "Gibson ES 335", description = "Archtop Semi-acoustic",
-	picture="https://placeimg.com/150/150/any", category = cat2)
+	picture="/static/img/gibson-es335.jpg", category = cat2)
 session.add(Item5)
 session.commit()
 
@@ -97,27 +97,27 @@ session.add(cat1)
 session.commit()
 
 Item1 = Item(user_id=1, name = "Fender Jazz Bass", description = "Smooth",
-	picture="https://placeimg.com/150/150/any", category = cat3)
+	picture="/static/img/fender-jazz.jpg", category = cat3)
 session.add(Item1)
 session.commit()
 
 Item2 = Item(user_id=1, name = "Fender Precision Bass", description = "A Classic",
-	picture="https://placeimg.com/150/150/any", category = cat3)
+	picture="/static/img/Fender-P.jpg", category = cat3)
 session.add(Item2)
 session.commit()
 
 Item3 = Item(user_id=1, name = "Rickenbacker", description = "Heavy Enough For Lemmy",
-	picture="https://placeimg.com/150/150/any", category = cat3)
+	picture="/static/img/rickenbackerb.jpg", category = cat3)
 session.add(Item3)
 session.commit()
 
 Item4 = Item(user_id=1, name = "Gibson Explorer Bass", description = "Get Yer Growl On",
-	picture="https://placeimg.com/150/150/any", category = cat3)
+	picture="/static/img/gibson-xbass.jpg", category = cat3)
 session.add(Item4)
 session.commit()
 
 Item5 = Item(user_id=1, name = "Ernie Ball Music Man", description = "Suck My Kiss",
-	picture="https://placeimg.com/150/150/any", category = cat3)
+	picture="/static/img/ernieball-mm.jpg", category = cat3)
 session.add(Item5)
 session.commit()
 
