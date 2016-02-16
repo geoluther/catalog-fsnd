@@ -26,6 +26,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+
 # Create anti-forgery state token
 @app.route('/login')
 def showLogin():
@@ -34,7 +35,6 @@ def showLogin():
     login_session['state'] = state
     # return "The current session state is %s" % login_session['state']
     return render_template('login.html', STATE=state)
-
 
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
@@ -96,7 +96,7 @@ def fbconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 200px; height: 200px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
 
     flash("Now logged in as %s" % login_session['username'])
     return output
@@ -117,9 +117,9 @@ def fbdisconnect():
 def gconnect():
     # Validate state token
     if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+      response = make_response(json.dumps('Invalid state parameter.'), 401)
+      response.headers['Content-Type'] = 'application/json'
+      return response
     # Obtain authorization code
     code = request.data
 
@@ -130,47 +130,47 @@ def gconnect():
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
         response = make_response(
-            json.dumps('Failed to upgrade the authorization code.'), 401)
+          json.dumps('Failed to upgrade the authorization code.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
 
     # Check that the access token is valid.
     access_token = credentials.access_token
     url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s'
-           % access_token)
+     % access_token)
     h = httplib2.Http()
     result = json.loads(h.request(url, 'GET')[1])
     # If there was an error in the access token info, abort.
     if result.get('error') is not None:
-        response = make_response(json.dumps(result.get('error')), 500)
-        response.headers['Content-Type'] = 'application/json'
+      response = make_response(json.dumps(result.get('error')), 500)
+      response.headers['Content-Type'] = 'application/json'
 
     # Verify that the access token is used for the intended user.
     gplus_id = credentials.id_token['sub']
     if result['user_id'] != gplus_id:
-        response = make_response(
-            json.dumps("Token's user ID doesn't match given user ID."), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+      response = make_response(
+        json.dumps("Token's user ID doesn't match given user ID."), 401)
+      response.headers['Content-Type'] = 'application/json'
+      return response
 
     # Verify that the access token is valid for this app.
     if result['issued_to'] != CLIENT_ID:
-        response = make_response(
-            json.dumps("Token's client ID does not match app's."), 401)
-        print "Token's client ID does not match app's."
-        response.headers['Content-Type'] = 'application/json'
-        return response
+      response = make_response(
+        json.dumps("Token's client ID does not match app's."), 401)
+      print "Token's client ID does not match app's."
+      response.headers['Content-Type'] = 'application/json'
+      return response
 
-    stored_credentials = login_session.get('credentials')
-    stored_gplus_id = login_session.get('gplus_id')
-    if stored_credentials is not None and gplus_id == stored_gplus_id:
+      stored_access_token = login_session.get('access_token')
+      stored_gplus_id = login_session.get('gplus_id')
+      if stored_access_token is not None and gplus_id == stored_gplus_id:
         response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+         200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
     # Store the access token in the session for later use.
-    login_session['credentials'] = credentials
+    login_session['access_token'] = credentials.access_token
     login_session['gplus_id'] = gplus_id
 
     # Get user info
@@ -183,13 +183,11 @@ def gconnect():
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
-    # ADD PROVIDER TO LOGIN SESSION
-    login_session['provider'] = 'google'
 
-    # see if user exists, if it doesn't make a new one
-    user_id = getUserID(data["email"])
+    user_id = getUserID(data['email'])
     if not user_id:
-        user_id = createUser(login_session)
+      user_id = createUser(login_session)
+
     login_session['user_id'] = user_id
 
     output = ''
@@ -198,13 +196,14 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 200px; height: 200px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
     flash("you are now logged in as %s" % login_session['username'])
     print "done!"
     return output
 
 
 # User Helper Functions
+
 def createUser(login_session):
     newUser = User(name=login_session['username'], email=login_session[
                    'email'], picture=login_session['picture'])
@@ -228,28 +227,40 @@ def getUserID(email):
 
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
+
 @app.route('/gdisconnect')
 def gdisconnect():
-    # Only disconnect a connected user.
-    credentials = login_session.get('credentials')
-    if credentials is None:
-        response = make_response(
-            json.dumps('Current user not connected.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
-    access_token = credentials.access_token
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % access_token
+    access_token = login_session['access_token']
+    print 'In gdisconnect access token is %s', access_token
+    print 'User name is: '
+    print login_session['username']
+    if access_token is None:
+      print 'Access Token is None'
+      response = make_response(json.dumps('Current user not connected.'), 401)
+      response.headers['Content-Type'] = 'application/json'
+      return response
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
-    if result['status'] != '200':
-        # For whatever reason, the given token was invalid.
-        response = make_response(
-            json.dumps('Failed to revoke token for given user.', 400))
-        response.headers['Content-Type'] = 'application/json'
-        return response
+    print 'result is '
+    print result
+    if result['status'] == '200':
+      del login_session['access_token']
+      del login_session['gplus_id']
+      del login_session['username']
+      del login_session['email']
+      del login_session['picture']
+      response = make_response(json.dumps('Successfully disconnected.'), 200)
+      response.headers['Content-Type'] = 'application/json'
+      return response
+    else:
+
+      response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+      response.headers['Content-Type'] = 'application/json'
+      return response
 
 
-# JSON APIs to view DB Information
+# JSON APIs to view Restaurant Information
 @app.route('/restaurant/<int:restaurant_id>/menu/JSON')
 def restaurantMenuJSON(restaurant_id):
     restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
@@ -264,123 +275,184 @@ def menuItemJSON(restaurant_id, menu_id):
     return jsonify(Menu_Item=Menu_Item.serialize)
 
 
-@app.route('/catalog/JSON')
-def catalogJSON():
-    items = session.query(Item).all()
-    return jsonify(items=[r.serialize for r in items])
+@app.route('/restaurant/JSON')
+def restaurantsJSON():
+    restaurants = session.query(Restaurant).all()
+    return jsonify(restaurants=[r.serialize for r in restaurants])
 
 
-# Show all categories
+
+# Show all restaurants
 @app.route('/')
 @app.route('/catalog/')
-def showCatalog():
+def showCategories():
   categories = session.query(Category).order_by(asc(Category.name))
+  ## fix to get recent 10 adds, i.e. 10 greatest ID #
   recent_items = session.query(Item).order_by(desc(Item.id)).limit(8)
-
-  if 'username' not in login_session:
-    print "rending public_catalog.html"
+  for item in recent_items:
+    print item.name
+  if 'username' not in login_session: ## add public_catalog.html file later
     return render_template('public_catalog.html', categories=categories, recents=recent_items)
   else:
-    print "rending catalog.html"
     return render_template('catalog.html', categories=categories, recents=recent_items)
+
+# Create a new restaurant
+
+
+@app.route('/catalog/new/', methods=['GET', 'POST'])
+def newItem():
+  if 'username' not in login_session:
+    return redirect('/login')
+  if request.method == 'POST':
+    newIten = Item(
+      name=request.form['name'], user_id=login_session['user_id'])
+    session.add(newRestaurant)
+    flash('New Item %s Successfully Created' % newItem.name)
+    session.commit()
+    return redirect(url_for('showCategories'))
+  else:
+    return render_template('newItem.html')
+
+# Edit a restaurant
+
+
+@app.route('/restaurant/<int:restaurant_id>/edit/', methods=['GET', 'POST'])
+def editRestaurant(restaurant_id):
+  print "edit restaurant"
+  if 'username' not in login_session:
+    print "redirect to login!"
+    return redirect('/login')
+  editedRestaurant = session.query(
+    Restaurant).filter_by(id=restaurant_id).one()
+  print editedRestaurant.name
+  if request.method == 'POST':
+    print "post request!"
+    if request.form['name']:
+      editedRestaurant.name = request.form['name']
+      flash('Restaurant Successfully Edited %s' % editedRestaurant.name)
+      return redirect(url_for('showRestaurants'))
+  else:
+      print "render editRestaurant.html"
+      return render_template('editRestaurant.html', restaurant=editedRestaurant)
+
+
+# Delete a restaurant
+@app.route('/restaurant/<int:restaurant_id>/delete/', methods=['GET', 'POST'])
+def deleteRestaurant(restaurant_id):
+  if 'username' not in login_session:
+    return redirect('/login')
+  restaurantToDelete = session.query(
+    Restaurant).filter_by(id=restaurant_id).one()
+  if request.method == 'POST':
+    session.delete(restaurantToDelete)
+    flash('%s Successfully Deleted' % restaurantToDelete.name)
+    session.commit()
+    return redirect(url_for('showRestaurants', restaurant_id=restaurant_id))
+  else:
+    return render_template('deleteRestaurant.html', restaurant=restaurantToDelete)
+
+
+# Show a category menu
+## check if user is owner, if so, render rest page,
+## else, render public page
+@app.route('/catalog/<int:category_id>/')
+@app.route('/catalog/<int:category_id>/item/')
+def showItems(category_id):
+  category = session.query(Category).filter_by(id=category_id).one()
+  items = session.query(Item).filter_by(
+    category_id=category_id).all()
+  #creator = getUserInfo(restaurant.user_id)
+  creator = "foo"
+  print creator
+  if ('username' not in login_session or
+    creator.id != login_session['user_id']):
+    return render_template('public_items.html', items=items,
+      category= category, creator= creator)
+  else:
+    return render_template('items.html', items=items,
+      category= category, creator= creator)
 
 
 ## Route with category names
 ## check if user is owner, if so, render rest page,
 ## else, render public page
-@app.route('/catalog/<category_name>/items/')
-def showCategory(category_name):
-  categories = session.query(Category).order_by(asc(Category.name)).all()
+@app.route('/catalog/<string:category_name>/')
+@app.route('/catalog/<string:category_name>/item/')
+def showItemNames(category_name):
   category = session.query(Category).filter_by(name=category_name).one()
-  print "calling showCategory"
-  print category.id, category.name
+  category_id = category.id
   items = session.query(Item).filter_by(
-    category_id=category.id).all()
-
-  if 'username' not in login_session:
-    return render_template('public_category.html', items=items,
-      category= category, categories = categories)
-  else:
-    return render_template('category.html', items=items,
-      category= category, categories = categories)
-
-
-@app.route('/catalog/<path:item_name>/')
-def showItem(item_name):
-  print item_name
-  item = session.query(Item).filter_by(name=item_name).one()
-  creator = getUserInfo(item.user_id)
+    category_id=category_id).all()
+  #creator = getUserInfo(restaurant.user_id)
+  creator = "foo"
+  print creator
   if ('username' not in login_session or
     creator.id != login_session['user_id']):
-    return render_template('public_item.html', item=item)
+    return render_template('public_items.html', items=items,
+      category= category, creator= creator)
   else:
-    return render_template('item.html', item=item)
+    return render_template('items.html', items=items,
+      category= category, creator= creator)
 
 
-# Create a new item
-@app.route('/catalog/new/', methods=['GET', 'POST'])
-def newItem():
+
+# Create a new menu item
+@app.route('/restaurant/<int:restaurant_id>/menu/new/', methods=['GET', 'POST'])
+def newMenuItem(restaurant_id):
   if 'username' not in login_session:
     return redirect('/login')
-
+    restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
   if request.method == 'POST':
-      cat = request.form['category']
-      category = session.query(Category).filter_by(name=cat).one()
-      newItem = Item(name=request.form['name'], description=request.form[
-                         'description'], picture=request.form['picture'],
-                         category=category, user_id=login_session['user_id'])
-      ## fix so items can't have same names
-      ## error page if name is duplicate?
+      newItem = MenuItem(name=request.form['name'], description=request.form[
+                         'description'], price=request.form['price'], course=request.form['course'], restaurant_id=restaurant_id)
       session.add(newItem)
       session.commit()
-      flash('New %s Item Successfully Created' % (newItem.name))
-      return redirect(url_for('showItem', item_name=newItem.name))
+      flash('New Menu %s Item Successfully Created' % (newItem.name))
+      return redirect(url_for('showMenu', restaurant_id=restaurant_id))
   else:
-      return render_template('new_item.html')
-
+      return render_template('newmenuitem.html', restaurant_id=restaurant_id)
 
 # Edit a menu item
-@app.route('/catalog/<path:item_name>/edit/', methods=['GET', 'POST'])
-def editItem(item_name):
+
+
+@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/edit', methods=['GET', 'POST'])
+def editMenuItem(restaurant_id, menu_id):
   if 'username' not in login_session:
     return redirect('/login')
 
-  editedItem = session.query(Item).filter_by(name=item_name).first()
-
+  editedItem = session.query(MenuItem).filter_by(id=menu_id).one()
+  restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
   if request.method == 'POST':
       if request.form['name']:
           editedItem.name = request.form['name']
       if request.form['description']:
           editedItem.description = request.form['description']
-      if request.form['picture']:
-        editedItem.picture = request.form['picture']
-      # fix categories
-      if request.form['category']:
-        cat = request.form['category']
-        category = session.query(Category).filter_by(name=cat).one()
-        editedItem.category = category
+      if request.form['price']:
+          editedItem.price = request.form['price']
+      if request.form['course']:
+          editedItem.course = request.form['course']
       session.add(editedItem)
       session.commit()
-      flash('Item Successfully Edited')
-      return redirect(url_for('showItem', item_name=editedItem.name))
+      flash('Menu Item Successfully Edited')
+      return redirect(url_for('showMenu', restaurant_id=restaurant_id))
   else:
-      return render_template('edit_item.html', item=editedItem)
+      return render_template('editmenuitem.html', restaurant_id=restaurant_id, menu_id=menu_id, item=editedItem)
 
 
 # Delete a menu item
-@app.route('/catalog/<path:item_name>/delete/', methods=['GET', 'POST'])
-def deleteItem(item_name):
+@app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/delete', methods=['GET', 'POST'])
+def deleteMenuItem(restaurant_id, menu_id):
   if 'username' not in login_session:
     return redirect('/login')
-  itemToDelete = session.query(Item).filter_by(name=item_name).one()
+  restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
+  itemToDelete = session.query(MenuItem).filter_by(id=menu_id).one()
   if request.method == 'POST':
-    session.delete(itemToDelete)
-    session.commit()
-    flash('Item Successfully Deleted')
-    return redirect(url_for('showCatalog'))
+      session.delete(itemToDelete)
+      session.commit()
+      flash('Menu Item Successfully Deleted')
+      return redirect(url_for('showMenu', restaurant_id=restaurant_id))
   else:
-    return render_template('delete_Item.html', item=itemToDelete)
-
+      return render_template('deleteMenuItem.html', item=itemToDelete)
 
 # Disconnect based on provider
 @app.route('/disconnect')
@@ -399,12 +471,13 @@ def disconnect():
         del login_session['user_id']
         del login_session['provider']
         flash("You have successfully been logged out.")
-        return redirect(url_for('showCatalog'))
+        return redirect(url_for('showRestaurants'))
     else:
         flash("You were not logged in")
-        return redirect(url_for('showCatalog'))
+        return redirect(url_for('showRestaurants'))
 
 
+## commented out for heroku deploymnent
 if __name__ == '__main__':
   app.secret_key = 'super_secret_key'
   app.debug = True

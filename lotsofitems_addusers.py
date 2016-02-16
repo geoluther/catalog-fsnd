@@ -1,0 +1,129 @@
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from database_setup import Base, Item, Category, User
+
+engine = create_engine('sqlite:///itemcatalog.db')
+# Bind the engine to the metadata of the Base class so that the
+# declaratives can be accessed through a DBSession instance
+Base.metadata.bind = engine
+
+DBSession = sessionmaker(bind=engine)
+# A DBSession() instance establishes all conversations with the database
+# and represents a "staging zone" for all the objects loaded into the
+# database session object. Any change made against the objects in the
+# session won't be persisted into the database until you call
+# session.commit(). If you're not happy about the changes, you can
+# revert all of them back to the last commit by calling
+# session.rollback()
+session = DBSession()
+
+User1 = User(name="Joe Guitar Guy", email="tinnyTim@udacity.com",
+             picture='https://pbs.twimg.com/profile_images/2671170543/18debd694829ed78203a5a36dd364160_400x400.png')
+session.add(User1)
+session.commit()
+
+User2 = User(name="Mr. No Stairway", email="nostairway@udacity.com",
+             picture='https://pbs.twimg.com/profile_images/2671170543/18debd694829ed78203a5a36dd364160_400x400.png')
+session.add(User2)
+session.commit()
+
+# Categories
+
+cat1 = Category(name="Classic Keyboards")
+session.add(cat1)
+session.commit()
+
+Item1 = Item(user_id=1, name = "Yamaha DX7", description = "Classic FM Synthesis",
+	picture="https://placeimg.com/150/150/any", category = cat1)
+session.add(Item1)
+session.commit()
+
+Item2 = Item(user_id=1, name = "microKORG", description = "Synthesizer + Vocoder",
+	picture="https://placeimg.com/150/150/any", category = cat1)
+session.add(Item2)
+session.commit()
+
+Item3 = Item(user_id=1, name = "ARP 2600", description = "In your dreams",
+	picture="https://placeimg.com/150/150/any", category = cat1)
+session.add(Item3)
+session.commit()
+
+Item4 = Item(user_id=1, name = "Roland Jupiter 4", description = "Her name is Rio",
+	picture="https://placeimg.com/150/150/any", category = cat1)
+session.add(Item4)
+session.commit()
+
+Item5 = Item(user_id=1, name = "Moog Modular", description = "Monophonic Nirvana",
+	picture="https://placeimg.com/150/150/any", category = cat1)
+session.add(Item5)
+session.commit()
+
+## Category Two
+
+cat2 = Category(name="Guitars")
+session.add(cat1)
+session.commit()
+
+Item1 = Item(user_id=2, name = "Fender Stratocaster", description = "Single re-Coiling",
+	picture="https://placeimg.com/150/150/any", category = cat2)
+session.add(Item1)
+session.commit()
+
+Item2 = Item(user_id=2, name = "Fender Telecaster", description = "When Two Singles is Enough",
+	picture="https://placeimg.com/150/150/any", category = cat2)
+session.add(Item2)
+session.commit()
+
+Item3 = Item(user_id=2, name = "Gibson Les Paul", description = "Heavy Enough",
+	picture="https://placeimg.com/150/150/any", category = cat2)
+session.add(Item3)
+session.commit()
+
+Item4 = Item(user_id=2, name = "Gretsch Country Gentleman", description = "Yes Yes Yes",
+	picture="https://placeimg.com/150/150/any", category = cat2)
+session.add(Item4)
+session.commit()
+
+Item5 = Item(user_id=2, name = "Gibson ES 335", description = "Archtop Semi-acoustic",
+	picture="https://placeimg.com/150/150/any", category = cat2)
+session.add(Item5)
+session.commit()
+
+# basses
+
+cat3 = Category(name="Basses")
+session.add(cat1)
+session.commit()
+
+Item1 = Item(user_id=1, name = "Fender Jazz Bass", description = "Smooth",
+	picture="https://placeimg.com/150/150/any", category = cat3)
+session.add(Item1)
+session.commit()
+
+Item2 = Item(user_id=1, name = "Fender Precision Bass", description = "A Classic",
+	picture="https://placeimg.com/150/150/any", category = cat3)
+session.add(Item2)
+session.commit()
+
+Item3 = Item(user_id=1, name = "Rickenbacker", description = "Heavy Enough For Lemmy",
+	picture="https://placeimg.com/150/150/any", category = cat3)
+session.add(Item3)
+session.commit()
+
+Item4 = Item(user_id=1, name = "Gibson Explorer Bass", description = "Get Yer Growl On",
+	picture="https://placeimg.com/150/150/any", category = cat3)
+session.add(Item4)
+session.commit()
+
+Item5 = Item(user_id=1, name = "Ernie Ball Music Man", description = "Suck My Kiss",
+	picture="https://placeimg.com/150/150/any", category = cat3)
+session.add(Item5)
+session.commit()
+
+#KEEP ADDING STUFF
+
+## add users here
+
+print "added lots of items and users!"
+
