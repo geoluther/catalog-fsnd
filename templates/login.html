@@ -20,6 +20,7 @@
   <a href="{{ url_for('showCatalog') }}"><h3>Back</h3></a></div>
 </div>
 <hr>
+
   <!-- GOOGLE PLUS SIGN IN BUTTON-->
 <div class="row">
 <div class="col-sm-2"></div>
@@ -49,10 +50,14 @@
 </fb:login-button>
 </button>
 </div></div>
+
 <div class="row">
 <div class="col-sm-2">
 <div id="result"></div>
-</div></div>
+</div>
+</div>
+
+
 <script>
   function signInCallback(authResult) {
     if (authResult['code']) {
