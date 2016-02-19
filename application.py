@@ -331,7 +331,7 @@ def newItem():
 
   if request.method == 'POST':
       cat = request.form['category']
-      category = session.query(Category).filter_by(name=cat).one()
+      category = session.query(Category).filter_by(name=cat).first()
       newItem = Item(name=request.form['name'], description=request.form[
                          'description'], picture=request.form['picture'],
                          category=category, user_id=login_session['user_id'])
@@ -363,7 +363,7 @@ def editItem(item_name):
       # fix categories
       if request.form['category']:
         cat = request.form['category']
-        category = session.query(Category).filter_by(name=cat).one()
+        category = session.query(Category).filter_by(name=cat).first()
         editedItem.category = category
       session.add(editedItem)
       session.commit()
@@ -378,7 +378,7 @@ def editItem(item_name):
 def deleteItem(item_name):
   if 'username' not in login_session:
     return redirect('/login')
-  itemToDelete = session.query(Item).filter_by(name=item_name).one()
+  itemToDelete = session.query(Item).filter_by(name=item_name).first()
   if request.method == 'POST':
     session.delete(itemToDelete)
     session.commit()
