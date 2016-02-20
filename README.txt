@@ -6,6 +6,7 @@ Musical Instrument Catalog Project
 - for local install, run database_set.py and lotsofitems_addusers.py first
 
 ## Notes
+- oauth2 via facebook or google
 - preloaded images are saved in static
 - user images added via img url
 - JSON Endpoint: http://localhost:5000/catalog/JSON

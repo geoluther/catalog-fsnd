@@ -252,7 +252,6 @@ def gdisconnect():
 
 
 # JSON APIs to view DB Information
-
 @app.route('/catalog/JSON')
 def catalogJSON():
     items = session.query(Item).all()
