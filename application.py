@@ -282,10 +282,7 @@ def showCategory(category_name):
   category = session.query(Category).filter_by(name=category_name).first()
   if category == None:
     abort(404)
-  print "calling showCategory"
-  print category.id, category.name
-  items = session.query(Item).filter_by(
-    category_id=category.id).all()
+  items = session.query(Item).filter_by(id=category.id).all()
 
   if 'username' not in login_session:
     return render_template('public_category.html', items=items,
@@ -346,7 +343,6 @@ def editItem(item_name):
           editedItem.description = request.form['description']
       if request.form['picture']:
         editedItem.picture = request.form['picture']
-      # fix categories
       if request.form['category']:
         cat = request.form['category']
         category = session.query(Category).filter_by(name=cat).first()
