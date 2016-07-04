@@ -266,10 +266,10 @@ def showCatalog():
   recent_items = session.query(Item).order_by(desc(Item.id)).limit(8)
 
   if 'username' not in login_session:
-    print "rending public_catalog.html"
+    print "rendering public_catalog.html"
     return render_template('public_catalog.html', categories=categories, recents=recent_items)
   else:
-    print "rending catalog.html"
+    print "rendering catalog.html"
     return render_template('catalog.html', categories=categories, recents=recent_items)
 
 
@@ -282,14 +282,14 @@ def showCategory(category_name):
   category = session.query(Category).filter_by(name=category_name).first()
   if category == None:
     abort(404)
-  items = session.query(Item).filter_by(id=category.id).all()
+  items = session.query(Item).filter_by(category_id=category.id).all()
 
   if 'username' not in login_session:
     return render_template('public_category.html', items=items,
-      category= category, categories = categories)
+      category=category, categories=categories)
   else:
     return render_template('category.html', items=items,
-      category= category, categories = categories)
+      category=category, categories=categories)
 
 
 @app.route('/catalog/<path:item_name>/')
